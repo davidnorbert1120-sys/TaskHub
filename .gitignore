@@ -1,16 +1,5 @@
-# Compiled class file
+# ==================== Java / Maven ====================
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -18,7 +7,73 @@
 *.zip
 *.tar.gz
 *.rar
+target/
+.mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# ==================== Spring Boot ====================
+*.log
+spring-shell.log
+
+# ==================== IntelliJ IDEA ====================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# ==================== VS Code ====================
+.vscode/
+*.code-workspace
+
+# ==================== Node.js / Angular ====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+.angular/
+.sass-cache/
+*.ngfactory.ts
+*.ngsummary.json
+
+# ==================== Környezeti / titkos fájlok ====================
+.env
+.env.local
+.env.*.local
+application-local.yml
+application-local.properties
+*.secret
+
+# ==================== OS ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V7
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==================== JaCoCo ====================
+/jacoco.exec
+
+# ==================== H2 adatbázis ====================
+*.db
+*.mv.db
+*.trace.db
+
+# ==================== Misc ====================
 hs_err_pid*
 replay_pid*
+.mtj.tmp/
+*.ctxt
