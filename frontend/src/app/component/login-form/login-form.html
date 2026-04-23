@@ -1,0 +1,36 @@
+<div class="container mt-5" style="max-width: 500px;">
+  <h2 class="mb-4">Bejelentkezés</h2>
+
+  <div *ngIf="globalError" class="alert alert-danger">{{ globalError }}</div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+    <div class="mb-3">
+      <label for="username" class="form-label">Felhasználónév</label>
+      <input id="username" type="text" class="form-control"
+             formControlName="username"
+             [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+      <div class="invalid-feedback" *ngIf="loginForm.get('username')?.errors?.['required'] && loginForm.get('username')?.touched">
+        A felhasználónév kötelező.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Jelszó</label>
+      <input id="password" type="password" class="form-control"
+             formControlName="password"
+             [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+      <div class="invalid-feedback" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
+        A jelszó kötelező.
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100" [disabled]="submitting">
+      {{ submitting ? 'Bejelentkezés...' : 'Bejelentkezés' }}
+    </button>
+
+    <div class="text-center mt-3">
+      <small>Nincs még fiókod? <a routerLink="/register">Regisztrálj!</a></small>
+    </div>
+  </form>
+</div>

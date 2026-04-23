@@ -43,7 +43,7 @@ POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-  "username": "david",
+  "username": "karoly",
   "email": "different@example.com",
   "password": "password123"
 }
@@ -55,5 +55,41 @@ Content-Type: application/json
 {
   "username": "different_user",
   "email": "david@example.com",
+  "password": "password123"
+}
+
+### Sikeres login
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "david",
+  "password": "password123"
+}
+
+### Hibás login - rossz jelszó
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "david",
+  "password": "wrongpassword"
+}
+
+### Hibás login - nem létező user
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "nonexistent",
+  "password": "password123"
+}
+
+### Validáció - üres username
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "",
   "password": "password123"
 }

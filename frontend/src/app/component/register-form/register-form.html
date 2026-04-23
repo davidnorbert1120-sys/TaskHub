@@ -17,6 +17,9 @@
       <div class="invalid-feedback" *ngIf="!fieldErrors['username'] && registerForm.get('username')?.errors?.['minlength']">
         Legalább 3 karakter.
       </div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['username'] && registerForm.get('username')?.errors?.['pattern']">
+        A felhasználónév nem tartalmazhat szóközt.
+      </div>
     </div>
 
     <div class="mb-3">
@@ -44,6 +47,9 @@
       </div>
       <div class="invalid-feedback" *ngIf="!fieldErrors['password'] && registerForm.get('password')?.errors?.['minlength']">
         Legalább 8 karakter.
+      </div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['password'] && registerForm.get('password')?.errors?.['pattern']">
+        A jelszó nem tartalmazhat szóközt.
       </div>
     </div>
 

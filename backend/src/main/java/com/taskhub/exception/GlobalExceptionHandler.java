@@ -94,4 +94,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, status);
     }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiError> handleInvalidCredentials(InvalidCredentialsException ex) {
+        LOGGER.warn("Invalid credentials: {}", ex.getMessage());
+        ApiError error = new ApiError(
+                "INVALID_CREDENTIALS",
+                "Authentication failed",
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
 }

@@ -1,6 +1,8 @@
 package com.taskhub.controller;
 
+import com.taskhub.dto.incoming.LoginCommand;
 import com.taskhub.dto.incoming.RegisterCommand;
+import com.taskhub.dto.outgoing.AuthResponse;
 import com.taskhub.dto.outgoing.UserItem;
 import com.taskhub.service.UserService;
 import jakarta.validation.Valid;
@@ -31,5 +33,13 @@ public class AuthController {
         log.info("Registering user with username: {}", command.getUsername());
         UserItem result = userService.register(command);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginCommand command) {
+
+        log.info("Login request for username: {}", command.getUsername());
+        AuthResponse result = userService.login(command);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

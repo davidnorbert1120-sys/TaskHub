@@ -2,6 +2,7 @@ package com.taskhub.dto.incoming;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class RegisterCommand {
 
     @NotBlank(message = "The username cannot be empty")
     @Size(min = 3, max = 50, message = "The username must be between 3 and 50 characters")
+    @Pattern(regexp = "\\S+", message = "The username must not contain whitespace")
     private String username;
 
     @NotBlank(message = "The email cannot be empty")
@@ -24,6 +26,7 @@ public class RegisterCommand {
 
     @NotBlank(message = "The password cannot be empty")
     @Size(min = 8, max = 100, message = "The password must be between 8 and 100 characters")
+    @Pattern(regexp = "\\S+", message = "The password must not contain whitespace")
     @ToString.Exclude
     private String password;
 }
