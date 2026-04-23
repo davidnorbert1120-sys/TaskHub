@@ -1,0 +1,54 @@
+<div class="container mt-5" style="max-width: 500px;">
+  <h2 class="mb-4">Regisztráció</h2>
+
+  <div *ngIf="globalError" class="alert alert-danger">{{ globalError }}</div>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+
+    <div class="mb-3">
+      <label for="username" class="form-label">Felhasználónév</label>
+      <input id="username" type="text" class="form-control"
+             formControlName="username"
+             [class.is-invalid]="fieldErrors['username'] || (registerForm.get('username')?.invalid && registerForm.get('username')?.touched)">
+      <div class="invalid-feedback" *ngIf="fieldErrors['username']">{{ fieldErrors['username'] }}</div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['username'] && registerForm.get('username')?.errors?.['required'] && registerForm.get('username')?.touched">
+        A felhasználónév kötelező.
+      </div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['username'] && registerForm.get('username')?.errors?.['minlength']">
+        Legalább 3 karakter.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input id="email" type="email" class="form-control"
+             formControlName="email"
+             [class.is-invalid]="fieldErrors['email'] || (registerForm.get('email')?.invalid && registerForm.get('email')?.touched)">
+      <div class="invalid-feedback" *ngIf="fieldErrors['email']">{{ fieldErrors['email'] }}</div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['email'] && registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched">
+        Az email kötelező.
+      </div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['email'] && registerForm.get('email')?.errors?.['email']">
+        Érvénytelen email cím.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Jelszó</label>
+      <input id="password" type="password" class="form-control"
+             formControlName="password"
+             [class.is-invalid]="fieldErrors['password'] || (registerForm.get('password')?.invalid && registerForm.get('password')?.touched)">
+      <div class="invalid-feedback" *ngIf="fieldErrors['password']">{{ fieldErrors['password'] }}</div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['password'] && registerForm.get('password')?.errors?.['required'] && registerForm.get('password')?.touched">
+        A jelszó kötelező.
+      </div>
+      <div class="invalid-feedback" *ngIf="!fieldErrors['password'] && registerForm.get('password')?.errors?.['minlength']">
+        Legalább 8 karakter.
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100" [disabled]="submitting">
+      {{ submitting ? 'Regisztráció...' : 'Regisztráció' }}
+    </button>
+  </form>
+</div>

@@ -20,6 +20,6 @@ public class Comment extends BaseEntity{
     private Task task;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
 }

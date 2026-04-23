@@ -74,4 +74,24 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, status);
     }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleUsernameAlreadyExists(UsernameAlreadyExistsException ex) {
+        LOGGER.error("Username conflict: ", ex);
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiError body = new ApiError("USERNAME_ALREADY_EXISTS", "A user with this username already exists.", ex.getLocalizedMessage());
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        LOGGER.error("Email conflict: ", ex);
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiError body = new ApiError("EMAIL_ALREADY_EXISTS", "A user with this email already exists.", ex.getLocalizedMessage());
+
+        return new ResponseEntity<>(body, status);
+    }
 }

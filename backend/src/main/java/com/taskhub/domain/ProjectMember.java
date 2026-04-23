@@ -18,6 +18,7 @@ import lombok.Setter;
 public class ProjectMember extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

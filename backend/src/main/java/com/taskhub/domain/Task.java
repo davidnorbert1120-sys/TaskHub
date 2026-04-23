@@ -17,7 +17,7 @@ public class Task extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String title;
 
-    @Column(length = 200)
+    @Column(length = 2000)
     private String description;
 
     @Enumerated(EnumType.STRING)

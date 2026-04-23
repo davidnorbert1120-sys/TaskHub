@@ -1,0 +1,59 @@
+### Sikeres regisztráció
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "david",
+  "email": "david@example.com",
+  "password": "password123"
+}
+
+### Hibás validáció - üres username
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "",
+  "email": "david@example.com",
+  "password": "password123"
+}
+
+### Hibás validáció - rövid jelszó
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "short"
+}
+
+### Hibás validáció - érvénytelen email
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "not-an-email",
+  "password": "password123"
+}
+
+### Conflict - duplikált username
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "david",
+  "email": "different@example.com",
+  "password": "password123"
+}
+
+### Conflict - duplikált email
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "different_user",
+  "email": "david@example.com",
+  "password": "password123"
+}

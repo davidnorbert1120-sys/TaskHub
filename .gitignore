@@ -77,3 +77,6 @@ hs_err_pid*
 replay_pid*
 .mtj.tmp/
 *.ctxt
+
+# ==================== Claude Code ====================
+.claude/
