@@ -18,11 +18,11 @@ export class RegisterForm {
   submitting = false;
 
   constructor(
-    private fb: FormBuilder,
+    private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
-    this.registerForm = this.fb.group({
+    this.registerForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.pattern(/^\S+$/), Validators.minLength(3), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.pattern(/^\S+$/), Validators.minLength(8)]]
@@ -45,27 +45,27 @@ export class RegisterForm {
           this.submitting = false;
           this.router.navigate(['/login']);
         },
-        error: (err: HttpErrorResponse) => {
-          console.error('Registration failed:', err);
+        error: (error: HttpErrorResponse) => {
+          console.error('Registration failed:', error);
           this.submitting = false;
-          this.handleError(err);
+          this.handleError(error);
         }
       });
     }
   }
 
-  private handleError(err: HttpErrorResponse): void {
-    if (err.status === 400 && err.error?.fieldErrors) {
-      for (const fe of err.error.fieldErrors) {
-        this.fieldErrors[fe.field] = fe.message;
+  private handleError(error: HttpErrorResponse): void {
+    if (error.status === 400 && error.error?.fieldErrors) {
+      for (const fieldError of error.error.fieldErrors) {
+        this.fieldErrors[fieldError.field] = fieldError.message;
       }
-    } else if (err.status === 409 && err.error?.errorCode) {
-      if (err.error.errorCode === 'USERNAME_ALREADY_EXISTS') {
+    } else if (error.status === 409 && error.error?.errorCode) {
+      if (error.error.errorCode === 'USERNAME_ALREADY_EXISTS') {
         this.fieldErrors['username'] = 'Ez a felhasználónév már foglalt.';
-      } else if (err.error.errorCode === 'EMAIL_ALREADY_EXISTS') {
+      } else if (error.error.errorCode === 'EMAIL_ALREADY_EXISTS') {
         this.fieldErrors['email'] = 'Ez az email cím már foglalt.';
       } else {
-        this.globalError = err.error.error ?? 'Ismeretlen hiba.';
+        this.globalError = error.error.error ?? 'Ismeretlen hiba.';
       }
     } else {
       this.globalError = 'Váratlan hiba történt. Próbáld újra.';

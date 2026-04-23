@@ -17,11 +17,11 @@ export class LoginForm {
   submitting = false;
 
   constructor(
-    private fb: FormBuilder,
+    private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
-    this.loginForm = this.fb.group({
+    this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
@@ -42,19 +42,19 @@ export class LoginForm {
           this.submitting = false;
           this.router.navigate(['/']);
         },
-        error: (err: HttpErrorResponse) => {
-          console.error('Login failed:', err);
+        error: (error: HttpErrorResponse) => {
+          console.error('Login failed:', error);
           this.submitting = false;
-          this.handleError(err);
+          this.handleError(error);
         }
       });
     }
   }
 
-  private handleError(err: HttpErrorResponse): void {
-    if (err.status === 401 && err.error?.errorCode === 'INVALID_CREDENTIALS') {
+  private handleError(error: HttpErrorResponse): void {
+    if (error.status === 401 && error.error?.errorCode === 'INVALID_CREDENTIALS') {
       this.globalError = 'Hibás felhasználónév vagy jelszó.';
-    } else if (err.status === 400 && err.error?.fieldErrors) {
+    } else if (error.status === 400 && error.error?.fieldErrors) {
       this.globalError = 'Kérlek töltsd ki az összes mezőt.';
     } else {
       this.globalError = 'Váratlan hiba történt. Próbáld újra.';

@@ -72,7 +72,7 @@ public class UserService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(command.getUsername(), command.getPassword())
             );
-        } catch (AuthenticationException ex) {
+        } catch (AuthenticationException exception) {
             log.warn("Failed login attempt for username: {}", command.getUsername());
             throw new InvalidCredentialsException();
         }
@@ -85,5 +85,12 @@ public class UserService {
 
         log.info("User logged in successfully: {}", user.getUsername());
         return new AuthResponse(token, userItem);
+    }
+
+    public UserItem getByUsername(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found in database: "
+                        + username));
+        return modelMapper.map(user, UserItem.class);
     }
 }
