@@ -9,13 +9,19 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { LoginForm } from './component/login-form/login-form';
 import {AuthInterceptor} from './interceptor/auth.interceptor';
+import { ProjectList } from './component/project-list/project-list';
+import { ProjectCreateForm } from './component/project-create-form/project-create-form';
+import { ProjectDetail } from './component/project-detail/project-detail';
 
 @NgModule({
   declarations: [
     App,
     Navbar,
     RegisterForm,
-    LoginForm
+    LoginForm,
+    ProjectList,
+    ProjectCreateForm,
+    ProjectDetail
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,102 @@
+<div class="container mt-4" style="max-width: 700px;">
+
+  <button type="button" class="btn btn-link mb-3 p-0" (click)="goBack()">
+    ← Vissza a projektekhez
+  </button>
+
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Betöltés...</span>
+    </div>
+  </div>
+
+  <div *ngIf="globalError && !project" class="alert alert-danger">
+    {{ globalError }}
+  </div>
+
+  <div *ngIf="project && !editing">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <h2 class="mb-0">{{ project.name }}</h2>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-primary" (click)="startEditing()">
+          Szerkesztés
+        </button>
+        <button type="button" class="btn btn-outline-danger" (click)="onDelete()">
+          Törlés
+        </button>
+      </div>
+    </div>
+
+    <p class="text-muted">
+      {{ project.description || 'Nincs leírás' }}
+    </p>
+
+    <hr />
+
+    <dl class="row text-muted small">
+      <dt class="col-sm-3">Tulajdonos</dt>
+      <dd class="col-sm-9">{{ project.ownerUsername }}</dd>
+
+      <dt class="col-sm-3">Létrehozva</dt>
+      <dd class="col-sm-9">{{ project.createdAt | date:'yyyy.MM.dd HH:mm' }}</dd>
+
+      <dt class="col-sm-3">Módosítva</dt>
+      <dd class="col-sm-9">{{ project.updatedAt | date:'yyyy.MM.dd HH:mm' }}</dd>
+    </dl>
+
+    <div *ngIf="globalError" class="alert alert-danger mt-3">
+      {{ globalError }}
+    </div>
+  </div>
+
+  <div *ngIf="project && editing">
+    <h2 class="mb-4">Projekt szerkesztése</h2>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSave()" novalidate>
+
+      <div class="mb-3">
+        <label for="name" class="form-label">Név *</label>
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          formControlName="name"
+          [class.is-invalid]="fieldHasError('name', 'required') || fieldHasError('name', 'maxlength')"
+        />
+        <div *ngIf="fieldHasError('name', 'required')" class="invalid-feedback">
+          A név megadása kötelező.
+        </div>
+        <div *ngIf="fieldHasError('name', 'maxlength')" class="invalid-feedback">
+          A név legfeljebb 100 karakter lehet.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Leírás</label>
+        <textarea
+          id="description"
+          class="form-control"
+          rows="4"
+          formControlName="description"
+          [class.is-invalid]="fieldHasError('description', 'maxlength')"
+        ></textarea>
+        <div *ngIf="fieldHasError('description', 'maxlength')" class="invalid-feedback">
+          A leírás legfeljebb 1000 karakter lehet.
+        </div>
+      </div>
+
+      <div *ngIf="globalError" class="alert alert-danger">
+        {{ globalError }}
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Mentés...' : 'Mentés' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancelEditing()" [disabled]="submitting">
+          Mégse
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

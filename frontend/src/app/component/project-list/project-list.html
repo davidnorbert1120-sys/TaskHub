@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Projektjeim</h2>
+    <button type="button" class="btn btn-primary" (click)="goToCreate()">
+      + Új projekt
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Betöltés...</span>
+    </div>
+  </div>
+
+  <div *ngIf="globalError" class="alert alert-danger">
+    {{ globalError }}
+  </div>
+
+  <div *ngIf="!loading && !globalError && projects.length === 0" class="text-center text-muted my-5">
+    <p>Még nincs projekted. Kattints a "+ Új projekt" gombra a kezdéshez!</p>
+  </div>
+
+  <div *ngIf="!loading && projects.length > 0" class="row g-3">
+    <div *ngFor="let project of projects" class="col-md-6 col-lg-4">
+      <div class="card h-100 project-card" (click)="goToDetail(project.id)">
+        <div class="card-body">
+          <h5 class="card-title">{{ project.name }}</h5>
+          <p class="card-text text-muted">
+            {{ project.description || 'Nincs leírás' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
