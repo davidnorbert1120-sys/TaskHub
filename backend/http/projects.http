@@ -1,0 +1,141 @@
+### Login - menti a tokent (futtasd először!)
+# @name loginRequest
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "david",
+  "password": "password123"
+}
+
+> {% client.global.set("authToken", response.body.token); %}
+
+### Sikeres project létrehozás
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Első projekt",
+  "description": "Ez az első tesztprojektem"
+}
+
+### Sikeres project létrehozás - csak név (description opcionális)
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Csak név projekt"
+}
+
+### Validáció - üres név
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "",
+  "description": "Üres név"
+}
+
+### Validáció - túl hosszú név (>100 karakter)
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "description": "Hosszú név"
+}
+
+### Project létrehozás token nélkül - 401
+POST http://localhost:8080/projects
+Content-Type: application/json
+
+{
+  "name": "Token nélkül",
+  "description": "Nem szabadna sikerülnie"
+}
+
+### Saját projektek listázása
+GET http://localhost:8080/projects
+Authorization: Bearer {{authToken}}
+
+### Egy projekt lekérése id alapján (módosítsd az id-t a sajátodra)
+GET http://localhost:8080/projects/1
+Authorization: Bearer {{authToken}}
+
+### Nem létező projekt - 404
+GET http://localhost:8080/projects/9999
+Authorization: Bearer {{authToken}}
+
+### Project frissítés
+PUT http://localhost:8080/projects/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Átnevezett projekt",
+  "description": "Frissített leírás"
+}
+
+### Project frissítés - üres név (validáció)
+PUT http://localhost:8080/projects/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "",
+  "description": "Hibás"
+}
+
+### Project törlése - 204 NO CONTENT
+DELETE http://localhost:8080/projects/1
+Authorization: Bearer {{authToken}}
+
+### Törölt project lekérése - 404
+GET http://localhost:8080/projects/1
+Authorization: Bearer {{authToken}}
+
+### --- Hozzáférés-tesztelés (másik user) ---
+
+### Második user regisztrálása
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "anna",
+  "email": "anna@example.com",
+  "password": "password123"
+}
+
+### Login mint anna
+# @name loginAsAnna
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "anna",
+  "password": "password123"
+}
+
+> {% client.global.set("annaToken", response.body.token); %}
+
+### Anna készít egy projektet
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "name": "Anna projektje",
+  "description": "Csak neki"
+}
+
+### David próbálja lekérni Anna projektjét - 403
+GET http://localhost:8080/projects/3
+Authorization: Bearer {{authToken}}
+
+### David próbálja törölni Anna projektjét - 403
+DELETE http://localhost:8080/projects/3
+Authorization: Bearer {{authToken}}

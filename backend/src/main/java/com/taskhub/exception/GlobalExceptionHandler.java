@@ -105,4 +105,26 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<ApiError> handleProjectNotFound(ProjectNotFoundException exception) {
+        LOGGER.warn("Project not found: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "PROJECT_NOT_FOUND",
+                "The requested project does not exist.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProjectAccessDeniedException.class)
+    public ResponseEntity<ApiError> handleProjectAccessDenied(ProjectAccessDeniedException exception) {
+        LOGGER.warn("Project access denied: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "PROJECT_ACCESS_DENIED",
+                "You do not have access to this project.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 }
