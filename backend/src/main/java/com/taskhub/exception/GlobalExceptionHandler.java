@@ -1,12 +1,12 @@
 package com.taskhub.exception;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,14 +46,15 @@ public class GlobalExceptionHandler {
         return validationError;
     }
 
-    @ExceptionHandler(JsonParseException.class)
-    public ResponseEntity<ApiError> handleJsonParseException(JsonParseException exception) {
-        LOGGER.error("Request JSON could not be parsed: ", exception);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
-        ApiError body = new ApiError("JSON_PARSE_ERROR", "The request could not be parsed as a valid JSON.", exception.getLocalizedMessage());
-
-        return new ResponseEntity<>(body, status);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleNotReadable(HttpMessageNotReadableException exception) {
+        LOGGER.warn("Request body could not be read: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "INVALID_REQUEST_BODY",
+                "The request body is invalid or contains incorrect values.",
+                exception.getMostSpecificCause().getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -181,5 +182,27 @@ public class GlobalExceptionHandler {
                 exception.getMessage()
         );
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<ApiError> handleTaskNotFound(TaskNotFoundException exception) {
+        LOGGER.warn("Task not found: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "TASK_NOT_FOUND",
+                "The requested task does not exist.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidAssigneeException.class)
+    public ResponseEntity<ApiError> handleInvalidAssignee(InvalidAssigneeException exception) {
+        LOGGER.warn("Invalid assignee: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "INVALID_ASSIGNEE",
+                "The selected user is not a member of this project.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

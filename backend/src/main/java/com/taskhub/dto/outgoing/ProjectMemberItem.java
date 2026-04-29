@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 public class ProjectMemberItem {
 
     private Long id;
+
     private String username;
+
     private MemberRole role;
 }

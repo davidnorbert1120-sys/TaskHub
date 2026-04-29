@@ -1,0 +1,296 @@
+### Login mint david
+# @name loginAsDavid
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "david",
+  "password": "password123"
+}
+
+> {% client.global.set("davidToken", response.body.token); %}
+
+### Login mint anna (előfeltétel: anna már regisztrálva, és tagja a projektnek)
+# @name loginAsAnna
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "anna",
+  "password": "password123"
+}
+
+> {% client.global.set("annaToken", response.body.token); %}
+
+### David létrehoz egy új projektet (vagy állítsd be kézzel a projectId-t)
+# @name createProject
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "name": "Tasks teszt projekt",
+  "description": "Tasks teszteléséhez"
+}
+
+> {% client.global.set("projectId", response.body.id); %}
+
+### David hozzáadja Annát a projekthez
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": "anna"
+}
+
+### --- Task létrehozás ---
+
+### David sikeresen létrehoz egy taskot (assignee nélkül, status nélkül)
+# @name createTask1
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Első feladat",
+  "description": "Ezt el kell végezni",
+  "priority": "HIGH"
+}
+
+> {% client.global.set("taskId", response.body.id); %}
+
+### Sikeres létrehozás Annának assignelve, dueDate-tel
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Anna feladata",
+  "description": "Anna fogja megcsinálni",
+  "priority": "MEDIUM",
+  "status": "IN_PROGRESS",
+  "dueDate": "2026-12-31",
+  "assigneeUsername": "anna"
+}
+
+### Anna (MEMBER) is létrehozhat taskot (mert tagja a projektnek)
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "title": "Anna saját taskja",
+  "priority": "LOW"
+}
+
+### --- Validáció ---
+
+### Hibás - üres title - 400
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "",
+  "priority": "MEDIUM"
+}
+
+### Hibás - hiányzó priority - 400
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Priority nélkül"
+}
+
+### Hibás - érvénytelen status érték - 400 vagy JSON_PARSE
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Rossz status",
+  "priority": "MEDIUM",
+  "status": "INVALID_STATUS"
+}
+
+### Hibás - nem létező assignee - 400 INVALID_ASSIGNEE
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Nem létező assignee",
+  "priority": "LOW",
+  "assigneeUsername": "nemletezo_user"
+}
+
+### --- Hozzáférés-vezérlés ---
+
+### Token nélkül - 401
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Token nélkül",
+  "priority": "LOW"
+}
+
+### Nem létező project - 404
+POST http://localhost:8080/projects/9999/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Hibás project id",
+  "priority": "LOW"
+}
+
+### --- Lekérés ---
+
+### Taskok listázása - David
+GET http://localhost:8080/projects/{{projectId}}/tasks
+Authorization: Bearer {{davidToken}}
+
+### Taskok listázása - Anna (MEMBER is láthatja)
+GET http://localhost:8080/projects/{{projectId}}/tasks
+Authorization: Bearer {{annaToken}}
+
+### Egy task részletei - 200
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}
+Authorization: Bearer {{davidToken}}
+
+### Nem létező task - 404
+GET http://localhost:8080/projects/{{projectId}}/tasks/9999
+Authorization: Bearer {{davidToken}}
+
+### --- Frissítés (PUT) ---
+
+### Sikeres frissítés - minden mezővel
+PUT http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Átírt feladat",
+  "description": "Új leírás",
+  "priority": "LOW",
+  "status": "IN_PROGRESS",
+  "dueDate": "2027-01-15",
+  "assigneeUsername": "anna"
+}
+
+### Frissítés - assignee eltávolítása (null)
+PUT http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Átírt feladat",
+  "description": "Új leírás",
+  "priority": "LOW",
+  "status": "IN_PROGRESS",
+  "dueDate": "2027-01-15"
+}
+
+### Frissítés - hibás (üres title) - 400
+PUT http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "",
+  "priority": "LOW",
+  "status": "TODO"
+}
+
+### --- Status PATCH (Kanban-hez) ---
+
+### Status frissítése DONE-ra
+PATCH http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/status
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "status": "DONE"
+}
+
+### Status frissítése TODO-ra
+PATCH http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/status
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "status": "TODO"
+}
+
+### Anna is átállíthatja a status-t (MEMBER joga)
+PATCH http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/status
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "status": "IN_PROGRESS"
+}
+
+### Status frissítés hibás értékkel - 400
+PATCH http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/status
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "status": "WRONG"
+}
+
+### --- Törlés ---
+
+### David törli a taskot - 204
+DELETE http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}
+Authorization: Bearer {{davidToken}}
+
+### Törölt task lekérése - 404
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}
+Authorization: Bearer {{davidToken}}
+
+### --- Cross-project biztonsági teszt ---
+
+### Hozz létre még egy projectet és benne egy taskot, mentsd el az id-t
+# @name createOtherProject
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "name": "Másik projekt",
+  "description": "Cross-project teszthez"
+}
+
+> {% client.global.set("otherProjectId", response.body.id); %}
+
+### Task a másik projektben
+# @name createOtherTask
+POST http://localhost:8080/projects/{{otherProjectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Másik projekt taskja",
+  "priority": "MEDIUM"
+}
+
+> {% client.global.set("otherTaskId", response.body.id); %}
+
+### Cross-project: a task id-jét megpróbáljuk az ELSŐ projecten keresztül lekérni - 404
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{otherTaskId}}
+Authorization: Bearer {{davidToken}}
+
+### Cross-project: status frissítés rossz project-úton - 404
+PATCH http://localhost:8080/projects/{{projectId}}/tasks/{{otherTaskId}}/status
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "status": "DONE"
+}

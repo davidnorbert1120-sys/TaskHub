@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class ProjectListItem {
 
     private Long id;
+
     private String name;
+
     private String description;
 }
