@@ -1,0 +1,191 @@
+### Login mint david - menti a tokent (futtasd először!)
+# @name loginAsDavid
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "david",
+  "password": "password123"
+}
+
+> {% client.global.set("davidToken", response.body.token); %}
+
+### David létrehoz egy projektet (jegyezd meg az id-t!)
+# @name createProject
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "name": "Csapatprojekt",
+  "description": "Tagokkal teszteljük"
+}
+
+> {% client.global.set("projectId", response.body.id); %}
+
+### Második user regisztrálása (Anna)
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "anna",
+  "email": "anna@example.com",
+  "password": "password123"
+}
+
+### Login mint Anna
+# @name loginAsAnna
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "anna",
+  "password": "password123"
+}
+
+> {% client.global.set("annaToken", response.body.token); %}
+
+### Tagok listázása - csak az OWNER van bent (David)
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{davidToken}}
+
+### Anna próbálja listázni - 403 (még nem tag)
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{annaToken}}
+
+### David hozzáadja Annát - 201
+# @name addAnna
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": "anna"
+}
+
+> {% client.global.set("annaMemberId", response.body.id); %}
+
+### Tagok listázása - most már David (OWNER) + Anna (MEMBER)
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{davidToken}}
+
+### Anna már listázhat - tagja a projektnek
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{annaToken}}
+
+### Anna látja a projektet a saját listájában is
+GET http://localhost:8080/projects
+Authorization: Bearer {{annaToken}}
+
+### Konfliktus - David újra hozzáadná Annát - 409
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": "anna"
+}
+
+### Validáció - üres username - 400
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": ""
+}
+
+### Nem létező user - 404
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": "nemletezo_user_123"
+}
+
+### Anna próbál tagot hozzáadni - 403 (csak OWNER tehet)
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "username": "david"
+}
+
+### Nem létező project - 404
+POST http://localhost:8080/projects/9999/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": "anna"
+}
+
+### Anna próbálja kivenni magát - 403 (nem OWNER)
+DELETE http://localhost:8080/projects/{{projectId}}/members/{{annaMemberId}}
+Authorization: Bearer {{annaToken}}
+
+### Tagok listázása + David (OWNER) member id mentése
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{davidToken}}
+
+> {%
+    const owner = response.body.find(member => member.role === "OWNER");
+    client.global.set("davidMemberId", owner.id);
+%}
+
+### David próbálja kivenni saját magát (OWNER-t) - 400 CANNOT_REMOVE_OWNER
+DELETE http://localhost:8080/projects/{{projectId}}/members/{{davidMemberId}}
+Authorization: Bearer {{davidToken}}
+
+### David kiveszi Annát - 204
+DELETE http://localhost:8080/projects/{{projectId}}/members/{{annaMemberId}}
+Authorization: Bearer {{davidToken}}
+
+### Anna már nem éri el a projektet - 403
+GET http://localhost:8080/projects/{{projectId}}
+Authorization: Bearer {{annaToken}}
+
+### Nem létező member id - 404
+DELETE http://localhost:8080/projects/{{projectId}}/members/9999
+Authorization: Bearer {{davidToken}}
+
+### Token nélkül - 401
+GET http://localhost:8080/projects/{{projectId}}/members
+
+### Anna (MEMBER) lekéri a projektet - 200 OK (láthatja)
+GET http://localhost:8080/projects/{{projectId}}
+Authorization: Bearer {{annaToken}}
+
+### Anna (MEMBER) próbálja módosítani a projektet - 403 ACCESS_DENIED
+PUT http://localhost:8080/projects/{{projectId}}
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "name": "Anna szeretné átírni",
+  "description": "De nem fog menni"
+}
+
+### Anna (MEMBER) próbálja törölni a projektet - 403 ACCESS_DENIED
+DELETE http://localhost:8080/projects/{{projectId}}
+Authorization: Bearer {{annaToken}}
+
+### David (OWNER) sikeresen módosít - 200 OK
+PUT http://localhost:8080/projects/{{projectId}}
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "name": "Csapatprojekt - frissítve",
+  "description": "OWNER simán átírhatja"
+}
+
+### Tagok listázása mindkét token-nel - mindkettő 200 OK
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{davidToken}}
+
+###
+GET http://localhost:8080/projects/{{projectId}}/members
+Authorization: Bearer {{annaToken}}

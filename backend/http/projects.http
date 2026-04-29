@@ -95,7 +95,7 @@ DELETE http://localhost:8080/projects/1
 Authorization: Bearer {{authToken}}
 
 ### Törölt project lekérése - 404
-GET http://localhost:8080/projects/1
+GET http://localhost:8080/projects/
 Authorization: Bearer {{authToken}}
 
 ### --- Hozzáférés-tesztelés (másik user) ---

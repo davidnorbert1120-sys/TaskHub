@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +64,17 @@ public class GlobalExceptionHandler {
         ApiError body = new ApiError("ILLEGAL_ARGUMENT_ERROR", "An illegal argument has been passed to the method.", exception.getLocalizedMessage());
 
         return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException exception) {
+        LOGGER.warn("No matching route: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "NOT_FOUND",
+                "The requested resource does not exist.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Throwable.class)
@@ -126,5 +138,48 @@ public class GlobalExceptionHandler {
                 exception.getMessage()
         );
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+    @ExceptionHandler(MemberAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleMemberAlreadyExists(MemberAlreadyExistsException exception) {
+        LOGGER.warn("Member conflict: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "MEMBER_ALREADY_EXISTS",
+                "This user is already a member of the project.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CannotRemoveOwnerException.class)
+    public ResponseEntity<ApiError> handleCannotRemoveOwner(CannotRemoveOwnerException exception) {
+        LOGGER.warn("Attempt to remove project owner: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "CANNOT_REMOVE_OWNER",
+                "The project owner cannot be removed.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ResponseEntity<ApiError> handleMemberNotFound(MemberNotFoundException exception) {
+        LOGGER.warn("Member not found: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "MEMBER_NOT_FOUND",
+                "The requested project member does not exist.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFound(UserNotFoundException exception) {
+        LOGGER.warn("User not found: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "USER_NOT_FOUND",
+                "The requested user does not exist.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 }

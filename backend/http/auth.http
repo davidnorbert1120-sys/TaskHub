@@ -43,7 +43,7 @@ POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-  "username": "karoly",
+  "username": "david",
   "email": "different@example.com",
   "password": "password123"
 }
