@@ -14,10 +14,11 @@
     {{ globalError }}
   </div>
 
+  <!-- Projekt adatlap (nézet mód) -->
   <div *ngIf="project && !editing">
     <div class="d-flex justify-content-between align-items-start mb-3">
       <h2 class="mb-0">{{ project.name }}</h2>
-      <div class="d-flex gap-2">
+      <div *ngIf="isCurrentUserOwner()" class="d-flex gap-2">
         <button type="button" class="btn btn-outline-primary" (click)="startEditing()">
           Szerkesztés
         </button>
@@ -47,8 +48,66 @@
     <div *ngIf="globalError" class="alert alert-danger mt-3">
       {{ globalError }}
     </div>
+
+    <!-- Tagok szekció -->
+    <hr class="mt-4" />
+    <h4 class="mb-3">Tagok</h4>
+
+    <div *ngIf="membersLoading" class="text-center my-3">
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Betöltés...</span>
+      </div>
+    </div>
+
+    <div *ngIf="membersError" class="alert alert-danger">
+      {{ membersError }}
+    </div>
+
+    <ul *ngIf="!membersLoading" class="list-group mb-3">
+      <li *ngFor="let member of members"
+          class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ member.username }}</strong>
+          <span class="badge ms-2"
+                [class.bg-success]="member.role === 'OWNER'"
+                [class.bg-secondary]="member.role === 'MEMBER'">
+            {{ member.role }}
+          </span>
+        </div>
+        <button *ngIf="isCurrentUserOwner() && member.role !== 'OWNER'"
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="onRemoveMember(member)">
+          Eltávolítás
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tag hozzáadása form (csak OWNER-nek) -->
+    <div *ngIf="isCurrentUserOwner()" class="card">
+      <div class="card-body">
+        <h6 class="card-title">Tag hozzáadása</h6>
+        <form [formGroup]="addMemberForm" (ngSubmit)="onAddMember()" novalidate>
+          <div class="d-flex gap-2">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Felhasználónév"
+              formControlName="username"
+            />
+            <button type="submit" class="btn btn-primary" [disabled]="addingMember">
+              {{ addingMember ? 'Hozzáadás...' : 'Hozzáadás' }}
+            </button>
+          </div>
+          <div *ngIf="addMemberError" class="alert alert-danger mt-2 mb-0 py-2">
+            {{ addMemberError }}
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
+  <!-- Szerkesztés mód -->
   <div *ngIf="project && editing">
     <h2 class="mb-4">Projekt szerkesztése</h2>
 

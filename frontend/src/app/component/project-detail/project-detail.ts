@@ -3,7 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProjectService } from '../../service/project.service';
+import { ProjectMemberService } from '../../service/project-member.service';
 import { ProjectItemModel } from '../../model/project-item.model';
+import { ProjectMemberItemModel } from '../../model/project-member-item.model';
+import { AddMemberCommandModel } from '../../model/add-member-command.model';
 
 @Component({
   selector: 'app-project-detail',
@@ -22,15 +25,27 @@ export class ProjectDetail implements OnInit {
   submitting = false;
   globalError: string | null = null;
 
+  members: ProjectMemberItemModel[] = [];
+  membersLoading = false;
+  membersError: string | null = null;
+
+  addMemberForm: FormGroup;
+  addingMember = false;
+  addMemberError: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private projectMemberService: ProjectMemberService
   ) {
     this.editForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.maxLength(1000)]]
+    });
+    this.addMemberForm = this.formBuilder.group({
+      username: ['', [Validators.required]]
     });
   }
 
@@ -41,6 +56,7 @@ export class ProjectDetail implements OnInit {
     } else {
       this.projectId = Number(idParam);
       this.loadProject();
+      this.loadMembers();
     }
   }
 
@@ -66,6 +82,29 @@ export class ProjectDetail implements OnInit {
           console.error('ProjectDetail: failed to load', error);
           this.loading = false;
           this.handleLoadError(error);
+        }
+      });
+    }
+  }
+
+  loadMembers(): void {
+    if (this.projectId === null) {
+      this.membersError = 'Hibás projekt azonosító.';
+    } else {
+      this.membersLoading = true;
+      this.membersError = null;
+      console.log('ProjectDetail: loading members for project', this.projectId);
+
+      this.projectMemberService.list(this.projectId).subscribe({
+        next: (members) => {
+          console.log('ProjectDetail: loaded', members.length, 'members');
+          this.members = members;
+          this.membersLoading = false;
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('ProjectDetail: failed to load members', error);
+          this.membersLoading = false;
+          this.membersError = 'Nem sikerült betölteni a tagokat.';
         }
       });
     }
@@ -116,7 +155,6 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-
   onDelete(): void {
     if (this.projectId === null) {
       this.globalError = 'Hibás projekt azonosító.';
@@ -139,6 +177,58 @@ export class ProjectDetail implements OnInit {
     }
   }
 
+  onAddMember(): void {
+    if (this.projectId === null) {
+      this.addMemberError = 'Hibás projekt azonosító.';
+    } else {
+      this.addMemberError = null;
+
+      if (this.addMemberForm.invalid) {
+        this.addMemberForm.markAllAsTouched();
+      } else {
+        this.addingMember = true;
+        const command: AddMemberCommandModel = this.addMemberForm.value;
+        console.log('ProjectDetail: adding member', command.username);
+
+        this.projectMemberService.add(this.projectId, command).subscribe({
+          next: (newMember) => {
+            console.log('ProjectDetail: member added successfully:', newMember.username);
+            this.members = [...this.members, newMember];
+            this.addMemberForm.reset();
+            this.addingMember = false;
+          },
+          error: (error: HttpErrorResponse) => {
+            console.error('ProjectDetail: failed to add member', error);
+            this.addingMember = false;
+            this.handleAddMemberError(error);
+          }
+        });
+      }
+    }
+  }
+
+  onRemoveMember(member: ProjectMemberItemModel): void {
+    if (this.projectId === null) {
+      this.membersError = 'Hibás projekt azonosító.';
+    } else {
+      const confirmed = confirm(`Biztosan eltávolítod ${member.username}-t a projektből?`);
+      if (confirmed) {
+        console.log('ProjectDetail: removing member', member.id);
+
+        this.projectMemberService.remove(this.projectId, member.id).subscribe({
+          next: () => {
+            console.log('ProjectDetail: member removed successfully');
+            this.members = this.members.filter(m => m.id !== member.id);
+          },
+          error: (error: HttpErrorResponse) => {
+            console.error('ProjectDetail: failed to remove member', error);
+            this.membersError = this.parseRemoveMemberError(error);
+          }
+        });
+      }
+    }
+  }
+
   goBack(): void {
     this.router.navigate(['/projects']);
   }
@@ -146,6 +236,23 @@ export class ProjectDetail implements OnInit {
   fieldHasError(fieldName: string, errorType: string): boolean {
     const field = this.editForm.get(fieldName);
     return !!(field && field.touched && field.hasError(errorType));
+  }
+
+  isCurrentUserOwner(): boolean {
+    if (this.project === null) {
+      return false;
+    } else {
+      return this.project.ownerUsername === this.getCurrentUsername();
+    }
+  }
+
+  private getCurrentUsername(): string | null {
+    const userJson = localStorage.getItem('taskhub_user');
+    if (userJson === null) {
+      return null;
+    } else {
+      return JSON.parse(userJson).username;
+    }
   }
 
   private handleLoadError(error: HttpErrorResponse): void {
@@ -167,6 +274,32 @@ export class ProjectDetail implements OnInit {
       this.globalError = 'Nincs jogosultságod a módosításhoz.';
     } else {
       this.globalError = 'Váratlan hiba történt. Próbáld újra.';
+    }
+  }
+
+  private handleAddMemberError(error: HttpErrorResponse): void {
+    if (error.status === 404 && error.error?.errorCode === 'USER_NOT_FOUND') {
+      this.addMemberError = 'Nincs ilyen felhasználó.';
+    } else if (error.status === 409) {
+      this.addMemberError = 'Ez a felhasználó már tag.';
+    } else if (error.status === 403) {
+      this.addMemberError = 'Csak a projekt tulajdonosa adhat hozzá tagot.';
+    } else if (error.status === 400) {
+      this.addMemberError = 'Add meg a felhasználónevet.';
+    } else {
+      this.addMemberError = 'Váratlan hiba történt.';
+    }
+  }
+
+  private parseRemoveMemberError(error: HttpErrorResponse): string {
+    if (error.status === 400 && error.error?.errorCode === 'CANNOT_REMOVE_OWNER') {
+      return 'A projekt tulajdonosát nem lehet eltávolítani.';
+    } else if (error.status === 403) {
+      return 'Csak a projekt tulajdonosa távolíthat el tagokat.';
+    } else if (error.status === 404) {
+      return 'A tag nem található.';
+    } else {
+      return 'Nem sikerült eltávolítani a tagot.';
     }
   }
 }
