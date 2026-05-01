@@ -1,0 +1,28 @@
+.kanban-column {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  min-height: 200px;
+}
+
+.kanban-title {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.task-card {
+  border-left: 3px solid #0d6efd;
+  cursor: default;
+}
+
+.task-card.task-done {
+  border-left-color: #198754;
+  opacity: 0.75;
+}
+
+.task-title {
+  font-size: 0.95rem;
+}

@@ -12,6 +12,7 @@ import {AuthInterceptor} from './interceptor/auth.interceptor';
 import { ProjectList } from './component/project-list/project-list';
 import { ProjectCreateForm } from './component/project-create-form/project-create-form';
 import { ProjectDetail } from './component/project-detail/project-detail';
+import { TaskBoard } from './component/task-board/task-board';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { ProjectDetail } from './component/project-detail/project-detail';
     LoginForm,
     ProjectList,
     ProjectCreateForm,
-    ProjectDetail
+    ProjectDetail,
+    TaskBoard
   ],
   imports: [
     BrowserModule,

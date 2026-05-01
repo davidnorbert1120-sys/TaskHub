@@ -1,0 +1,119 @@
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <h4 class="mb-0">Feladatok</h4>
+  <button type="button" class="btn btn-primary btn-sm" disabled>
+    + Új feladat
+  </button>
+</div>
+
+<div *ngIf="loading" class="text-center my-3">
+  <div class="spinner-border spinner-border-sm text-primary" role="status">
+    <span class="visually-hidden">Betöltés...</span>
+  </div>
+</div>
+
+<div *ngIf="globalError" class="alert alert-danger">
+  {{ globalError }}
+</div>
+
+<div *ngIf="!loading" class="row g-3">
+
+  <!-- TODO oszlop -->
+  <div class="col-md-4">
+    <div class="kanban-column">
+      <h6 class="kanban-title">
+        Tennivaló
+        <span class="badge bg-secondary ms-1">{{ tasksByStatus('TODO').length }}</span>
+      </h6>
+
+      <div class="kanban-cards">
+        <div *ngFor="let task of tasksByStatus('TODO')" class="card mb-2 task-card">
+          <div class="card-body p-2">
+            <div class="d-flex justify-content-between align-items-start">
+              <strong class="task-title">{{ task.title }}</strong>
+              <span class="badge {{ priorityBadgeClass(task.priority) }}">{{ task.priority }}</span>
+            </div>
+            <div *ngIf="task.assigneeUsername" class="text-muted small mt-1">
+              👤 {{ task.assigneeUsername }}
+            </div>
+            <div *ngIf="task.dueDate" class="text-muted small">
+              📅 {{ task.dueDate | date:'yyyy.MM.dd' }}
+            </div>
+            <div class="mt-2 d-flex gap-1">
+              <button type="button" class="btn btn-sm btn-outline-primary" (click)="moveTask(task, 'IN_PROGRESS')">
+                →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN_PROGRESS oszlop -->
+  <div class="col-md-4">
+    <div class="kanban-column">
+      <h6 class="kanban-title">
+        Folyamatban
+        <span class="badge bg-primary ms-1">{{ tasksByStatus('IN_PROGRESS').length }}</span>
+      </h6>
+
+      <div class="kanban-cards">
+        <div *ngFor="let task of tasksByStatus('IN_PROGRESS')" class="card mb-2 task-card">
+          <div class="card-body p-2">
+            <div class="d-flex justify-content-between align-items-start">
+              <strong class="task-title">{{ task.title }}</strong>
+              <span class="badge {{ priorityBadgeClass(task.priority) }}">{{ task.priority }}</span>
+            </div>
+            <div *ngIf="task.assigneeUsername" class="text-muted small mt-1">
+              👤 {{ task.assigneeUsername }}
+            </div>
+            <div *ngIf="task.dueDate" class="text-muted small">
+              📅 {{ task.dueDate | date:'yyyy.MM.dd' }}
+            </div>
+            <div class="mt-2 d-flex gap-1">
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="moveTask(task, 'TODO')">
+                ←
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-success" (click)="moveTask(task, 'DONE')">
+                →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONE oszlop -->
+  <div class="col-md-4">
+    <div class="kanban-column">
+      <h6 class="kanban-title">
+        Kész
+        <span class="badge bg-success ms-1">{{ tasksByStatus('DONE').length }}</span>
+      </h6>
+
+      <div class="kanban-cards">
+        <div *ngFor="let task of tasksByStatus('DONE')" class="card mb-2 task-card task-done">
+          <div class="card-body p-2">
+            <div class="d-flex justify-content-between align-items-start">
+              <strong class="task-title">{{ task.title }}</strong>
+              <span class="badge {{ priorityBadgeClass(task.priority) }}">{{ task.priority }}</span>
+            </div>
+            <div *ngIf="task.assigneeUsername" class="text-muted small mt-1">
+              👤 {{ task.assigneeUsername }}
+            </div>
+            <div *ngIf="task.dueDate" class="text-muted small">
+              📅 {{ task.dueDate | date:'yyyy.MM.dd' }}
+            </div>
+            <div class="mt-2 d-flex gap-1">
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="moveTask(task, 'IN_PROGRESS')">
+                ←
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

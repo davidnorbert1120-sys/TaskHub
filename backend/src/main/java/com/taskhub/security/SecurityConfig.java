@@ -33,17 +33,21 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {})
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint((request, response, authenticationException) -> {
+                        .authenticationEntryPoint((request, response,
+                                                   authenticationException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
-                            response.getWriter().write("{\"errorCode\":\"UNAUTHORIZED\",\"error\":\"Authentication required\",\"details\":\"" + authenticationException.getMessage() + "\"}");
+                            response.getWriter().write(
+                                    "{\"errorCode\":\"UNAUTHORIZED\",\"error\":\"Authentication required\",\"details\":\""
+                                            + authenticationException.getMessage() + "\"}");
                         })
                 )
                 .authenticationProvider(authenticationProvider())
