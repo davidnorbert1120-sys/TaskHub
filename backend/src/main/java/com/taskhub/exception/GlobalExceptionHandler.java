@@ -205,4 +205,26 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ApiError> handleCommentNotFound(CommentNotFoundException exception) {
+        LOGGER.warn("Comment not found: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "COMMENT_NOT_FOUND",
+                "The requested comment does not exist.",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CommentDeleteForbiddenException.class)
+    public ResponseEntity<ApiError> handleCommentDeleteForbidden(CommentDeleteForbiddenException exception) {
+        LOGGER.warn("Comment delete forbidden: {}", exception.getMessage());
+        ApiError body = new ApiError(
+                "COMMENT_DELETE_FORBIDDEN",
+                "You can only delete your own comments (or be the project owner).",
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 }

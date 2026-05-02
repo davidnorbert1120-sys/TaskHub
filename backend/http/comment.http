@@ -1,0 +1,285 @@
+### Login mint david
+# @name loginAsDavid
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "david",
+  "password": "password123"
+}
+
+> {% client.global.set("davidToken", response.body.token); %}
+
+### Login mint anna
+# @name loginAsAnna
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "anna",
+  "password": "password123"
+}
+
+> {% client.global.set("annaToken", response.body.token); %}
+
+### David létrehoz egy projektet
+# @name createProject
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "name": "Comments teszt projekt",
+  "description": "Comments teszteléséhez"
+}
+
+> {% client.global.set("projectId", response.body.id); %}
+
+### David hozzáadja Annát
+POST http://localhost:8080/projects/{{projectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "username": "anna"
+}
+
+### David létrehoz egy taskot
+# @name createTask
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Comment-elhető feladat",
+  "priority": "MEDIUM"
+}
+
+> {% client.global.set("taskId", response.body.id); %}
+
+### Regisztrálj még egy usert (pisti) - kívülálló a projektből
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "pisti",
+  "email": "pisti@example.com",
+  "password": "password123"
+}
+
+### Login mint pisti
+# @name loginAsPisti
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "pisti",
+  "password": "password123"
+}
+
+> {% client.global.set("pistiToken", response.body.token); %}
+
+### --- Komment létrehozás ---
+
+### David ír egy kommentet - 201
+# @name davidComment
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "content": "Ezt David írja - első komment"
+}
+
+> {% client.global.set("davidCommentId", response.body.id); %}
+
+### Anna is ír egy kommentet - 201
+# @name annaComment
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "content": "Ez Anna kommentje - rövid és vicces"
+}
+
+> {% client.global.set("annaCommentId", response.body.id); %}
+
+### David még egyet ír - többsoros tartalom
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "content": "Második David komment.\nEz egy második sor.\nÉs egy harmadik."
+}
+
+### --- Validáció ---
+
+### Üres komment - 400
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "content": ""
+}
+
+### Csak whitespace - 400 (NotBlank elkapja)
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "content": "      "
+}
+
+### --- Hozzáférés ---
+
+### Pisti (kívülálló) próbál kommentet írni - 403
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{pistiToken}}
+
+{
+  "content": "Pisti megpróbál bejutni"
+}
+
+### Pisti próbál listázni - 403
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Authorization: Bearer {{pistiToken}}
+
+### Token nélkül - 401
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+
+### --- Listázás ---
+
+### David listáz - 200, mind a 3 komment időrendi sorrendben
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Authorization: Bearer {{davidToken}}
+
+### Anna is listázhat - 200
+GET http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Authorization: Bearer {{annaToken}}
+
+### --- Nem létező - 404 ---
+
+### Nem létező task
+GET http://localhost:8080/projects/{{projectId}}/tasks/9999/comments
+Authorization: Bearer {{davidToken}}
+
+### Nem létező project
+GET http://localhost:8080/projects/9999/tasks/{{taskId}}/comments
+Authorization: Bearer {{davidToken}}
+
+### --- Törlés ---
+
+### Anna saját kommentjét törli - 204
+DELETE http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments/{{annaCommentId}}
+Authorization: Bearer {{annaToken}}
+
+### Anna újra próbálja törölni - 404 (már nem létezik)
+DELETE http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments/{{annaCommentId}}
+Authorization: Bearer {{annaToken}}
+
+### Anna írjon még egyet a következő tesztekhez
+# @name annaComment2
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "content": "Anna új kommentje teszthez"
+}
+
+> {% client.global.set("annaCommentId2", response.body.id); %}
+
+### David (OWNER) törli Anna kommentjét - 204
+DELETE http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments/{{annaCommentId2}}
+Authorization: Bearer {{davidToken}}
+
+### Most Anna írjon még egyet, és próbálja David törölni nem-OWNER kontextusban
+### Először: Anna létrehoz egy projektet, ahol Ő az OWNER
+# @name annaProject
+POST http://localhost:8080/projects
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "name": "Anna projektje",
+  "description": "Itt Anna az OWNER"
+}
+
+> {% client.global.set("annaProjectId", response.body.id); %}
+
+### Anna hozzáadja Davidot
+POST http://localhost:8080/projects/{{annaProjectId}}/members
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "username": "david"
+}
+
+### Anna létrehoz egy taskot
+# @name annaTask
+POST http://localhost:8080/projects/{{annaProjectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "title": "Anna projektjének taskja",
+  "priority": "LOW"
+}
+
+> {% client.global.set("annaTaskId", response.body.id); %}
+
+### Anna ír egy kommentet a saját projektjének taskjára
+# @name annaCommentInOwnProject
+POST http://localhost:8080/projects/{{annaProjectId}}/tasks/{{annaTaskId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{annaToken}}
+
+{
+  "content": "Anna kommentje a saját projektjében"
+}
+
+> {% client.global.set("annaCommentInOwn", response.body.id); %}
+
+### David (csak MEMBER, nem OWNER) próbálja törölni Anna kommentjét - 403 COMMENT_DELETE_FORBIDDEN
+DELETE http://localhost:8080/projects/{{annaProjectId}}/tasks/{{annaTaskId}}/comments/{{annaCommentInOwn}}
+Authorization: Bearer {{davidToken}}
+
+### --- Cross-task biztonsági teszt ---
+
+### Hozz létre még egy taskot az ELSŐ projektben
+# @name createTask2
+POST http://localhost:8080/projects/{{projectId}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "title": "Másik task",
+  "priority": "LOW"
+}
+
+> {% client.global.set("taskId2", response.body.id); %}
+
+### David ír egy kommentet a 2. taskra
+# @name commentOnTask2
+POST http://localhost:8080/projects/{{projectId}}/tasks/{{taskId2}}/comments
+Content-Type: application/json
+Authorization: Bearer {{davidToken}}
+
+{
+  "content": "Komment a másik taskra"
+}
+
+> {% client.global.set("commentOnTask2Id", response.body.id); %}
+
+### Cross-task: a 2. task kommentét megpróbáljuk törölni az ELSŐ task URL-jén keresztül - 404
+DELETE http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments/{{commentOnTask2Id}}
+Authorization: Bearer {{davidToken}}
+
+### Token nélkül törlés
+DELETE http://localhost:8080/projects/{{projectId}}/tasks/{{taskId}}/comments/1
