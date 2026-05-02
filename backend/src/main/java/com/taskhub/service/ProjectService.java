@@ -10,8 +10,11 @@ import com.taskhub.dto.outgoing.ProjectItem;
 import com.taskhub.dto.outgoing.ProjectListItem;
 import com.taskhub.exception.ProjectAccessDeniedException;
 import com.taskhub.exception.ProjectNotFoundException;
+import com.taskhub.domain.Task;
+import com.taskhub.repository.CommentRepository;
 import com.taskhub.repository.ProjectMemberRepository;
 import com.taskhub.repository.ProjectRepository;
+import com.taskhub.repository.TaskRepository;
 import com.taskhub.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -30,6 +33,10 @@ public class ProjectService {
 
     private final ProjectMemberRepository projectMemberRepository;
 
+    private final TaskRepository taskRepository;
+
+    private final CommentRepository commentRepository;
+
     private final UserRepository userRepository;
 
     private final ModelMapper modelMapper;
@@ -37,10 +44,14 @@ public class ProjectService {
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
                           ProjectMemberRepository projectMemberRepository,
+                          TaskRepository taskRepository,
+                          CommentRepository commentRepository,
                           UserRepository userRepository,
                           ModelMapper modelMapper) {
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
+        this.taskRepository = taskRepository;
+        this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
@@ -90,6 +101,12 @@ public class ProjectService {
 
     public void delete(Long id, String username) {
         Project project = findProjectAndRequireOwner(id, username);
+
+        List<Task> tasks = taskRepository.findAllByProject(project);
+        for (Task task : tasks) {
+            commentRepository.deleteAll(commentRepository.findAllByTaskOrderByCreatedAtAsc(task));
+        }
+        taskRepository.deleteAll(tasks);
         projectMemberRepository.deleteAll(projectMemberRepository.findAllByProject(project));
         projectRepository.delete(project);
         log.info("Project {} deleted by user {}", id, username);

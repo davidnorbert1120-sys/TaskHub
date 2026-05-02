@@ -15,6 +15,7 @@ import com.taskhub.exception.InvalidAssigneeException;
 import com.taskhub.exception.ProjectAccessDeniedException;
 import com.taskhub.exception.ProjectNotFoundException;
 import com.taskhub.exception.TaskNotFoundException;
+import com.taskhub.repository.CommentRepository;
 import com.taskhub.repository.ProjectMemberRepository;
 import com.taskhub.repository.ProjectRepository;
 import com.taskhub.repository.TaskRepository;
@@ -40,6 +41,8 @@ public class TaskService {
 
     private final UserRepository userRepository;
 
+    private final CommentRepository commentRepository;
+
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -47,11 +50,13 @@ public class TaskService {
                        ProjectRepository projectRepository,
                        ProjectMemberRepository projectMemberRepository,
                        UserRepository userRepository,
+                       CommentRepository commentRepository,
                        ModelMapper modelMapper) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -122,6 +127,7 @@ public class TaskService {
         findProjectAndRequireMember(projectId, callerUsername);
         Task task = findTaskInProject(projectId, taskId);
 
+        commentRepository.deleteAll(commentRepository.findAllByTaskOrderByCreatedAtAsc(task));
         taskRepository.delete(task);
         log.info("Task {} deleted from project {} by user {}", taskId, projectId, callerUsername);
     }
