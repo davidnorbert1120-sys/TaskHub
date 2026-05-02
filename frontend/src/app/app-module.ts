@@ -16,6 +16,7 @@ import { TaskBoard } from './component/task-board/task-board';
 import { TaskCreateForm } from './component/task-create-form/task-create-form';
 import { TaskDetail } from './component/task-detail/task-detail';
 import { TaskComments } from './component/task-comments/task-comments';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { TaskComments } from './component/task-comments/task-comments';
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
+    DragDropModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
