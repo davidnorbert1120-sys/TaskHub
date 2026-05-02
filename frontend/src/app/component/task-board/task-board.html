@@ -1,6 +1,6 @@
 <div class="mb-3 d-flex justify-content-between align-items-center">
   <h4 class="mb-0">Feladatok</h4>
-  <button type="button" class="btn btn-primary btn-sm" disabled>
+  <button type="button" class="btn btn-primary btn-sm" (click)="goToCreate()">
     + Új feladat
   </button>
 </div>
@@ -26,7 +26,9 @@
       </h6>
 
       <div class="kanban-cards">
-        <div *ngFor="let task of tasksByStatus('TODO')" class="card mb-2 task-card">
+        <div *ngFor="let task of tasksByStatus('TODO')"
+             class="card mb-2 task-card"
+             (click)="goToDetail(task)">
           <div class="card-body p-2">
             <div class="d-flex justify-content-between align-items-start">
               <strong class="task-title">{{ task.title }}</strong>
@@ -39,7 +41,7 @@
               📅 {{ task.dueDate | date:'yyyy.MM.dd' }}
             </div>
             <div class="mt-2 d-flex gap-1">
-              <button type="button" class="btn btn-sm btn-outline-primary" (click)="moveTask(task, 'IN_PROGRESS')">
+              <button type="button" class="btn btn-sm btn-outline-primary" (click)="moveTask(task, 'IN_PROGRESS'); $event.stopPropagation()">
                 →
               </button>
             </div>
@@ -58,7 +60,9 @@
       </h6>
 
       <div class="kanban-cards">
-        <div *ngFor="let task of tasksByStatus('IN_PROGRESS')" class="card mb-2 task-card">
+        <div *ngFor="let task of tasksByStatus('IN_PROGRESS')"
+             class="card mb-2 task-card"
+             (click)="goToDetail(task)">
           <div class="card-body p-2">
             <div class="d-flex justify-content-between align-items-start">
               <strong class="task-title">{{ task.title }}</strong>
@@ -71,10 +75,10 @@
               📅 {{ task.dueDate | date:'yyyy.MM.dd' }}
             </div>
             <div class="mt-2 d-flex gap-1">
-              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="moveTask(task, 'TODO')">
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="moveTask(task, 'TODO'); $event.stopPropagation()">
                 ←
               </button>
-              <button type="button" class="btn btn-sm btn-outline-success" (click)="moveTask(task, 'DONE')">
+              <button type="button" class="btn btn-sm btn-outline-success" (click)="moveTask(task, 'DONE'); $event.stopPropagation()">
                 →
               </button>
             </div>
@@ -93,7 +97,9 @@
       </h6>
 
       <div class="kanban-cards">
-        <div *ngFor="let task of tasksByStatus('DONE')" class="card mb-2 task-card task-done">
+        <div *ngFor="let task of tasksByStatus('DONE')"
+             class="card mb-2 task-card task-done"
+             (click)="goToDetail(task)">
           <div class="card-body p-2">
             <div class="d-flex justify-content-between align-items-start">
               <strong class="task-title">{{ task.title }}</strong>
@@ -106,7 +112,7 @@
               📅 {{ task.dueDate | date:'yyyy.MM.dd' }}
             </div>
             <div class="mt-2 d-flex gap-1">
-              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="moveTask(task, 'IN_PROGRESS')">
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="moveTask(task, 'IN_PROGRESS'); $event.stopPropagation()">
                 ←
               </button>
             </div>

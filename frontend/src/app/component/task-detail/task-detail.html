@@ -1,0 +1,152 @@
+<div class="container mt-4" style="max-width: 700px;">
+
+  <button type="button" class="btn btn-link mb-3 p-0" (click)="goBack()">
+    ← Vissza a projekthez
+  </button>
+
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Betöltés...</span>
+    </div>
+  </div>
+
+  <div *ngIf="globalError && !task" class="alert alert-danger">
+    {{ globalError }}
+  </div>
+
+  <!-- Nézet mód -->
+  <div *ngIf="task && !editing">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <h2 class="mb-0">{{ task.title }}</h2>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-primary" (click)="startEditing()">
+          Szerkesztés
+        </button>
+        <button type="button" class="btn btn-outline-danger" (click)="onDelete()">
+          Törlés
+        </button>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-3">
+      <span class="badge {{ statusBadgeClass(task.status) }}">{{ statusLabel(task.status) }}</span>
+      <span class="badge {{ priorityBadgeClass(task.priority) }}">{{ task.priority }}</span>
+    </div>
+
+    <p class="mb-4" style="white-space: pre-wrap;">
+      {{ task.description || 'Nincs leírás' }}
+    </p>
+
+    <hr />
+
+    <dl class="row text-muted small">
+      <dt class="col-sm-3">Hozzárendelt</dt>
+      <dd class="col-sm-9">{{ task.assigneeUsername || '— Senki —' }}</dd>
+
+      <dt class="col-sm-3">Határidő</dt>
+      <dd class="col-sm-9">{{ task.dueDate ? (task.dueDate | date:'yyyy.MM.dd') : '— Nincs —' }}</dd>
+
+      <dt class="col-sm-3">Létrehozva</dt>
+      <dd class="col-sm-9">{{ task.createdAt | date:'yyyy.MM.dd HH:mm' }}</dd>
+
+      <dt class="col-sm-3">Módosítva</dt>
+      <dd class="col-sm-9">{{ task.updatedAt | date:'yyyy.MM.dd HH:mm' }}</dd>
+    </dl>
+
+    <div *ngIf="globalError" class="alert alert-danger mt-3">
+      {{ globalError }}
+    </div>
+  </div>
+
+  <!-- Szerkesztés mód -->
+  <div *ngIf="task && editing">
+    <h2 class="mb-4">Feladat szerkesztése</h2>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSave()" novalidate>
+
+      <div class="mb-3">
+        <label for="title" class="form-label">Cím *</label>
+        <input
+          type="text"
+          id="title"
+          class="form-control"
+          formControlName="title"
+          [class.is-invalid]="fieldHasError('title', 'required') || fieldHasError('title', 'maxlength')"
+        />
+        <div *ngIf="fieldHasError('title', 'required')" class="invalid-feedback">
+          A cím megadása kötelező.
+        </div>
+        <div *ngIf="fieldHasError('title', 'maxlength')" class="invalid-feedback">
+          A cím legfeljebb 200 karakter lehet.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Leírás</label>
+        <textarea
+          id="description"
+          class="form-control"
+          rows="5"
+          formControlName="description"
+          [class.is-invalid]="fieldHasError('description', 'maxlength')"
+        ></textarea>
+        <div *ngIf="fieldHasError('description', 'maxlength')" class="invalid-feedback">
+          A leírás legfeljebb 2000 karakter lehet.
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="priority" class="form-label">Prioritás *</label>
+          <select id="priority" class="form-select" formControlName="priority">
+            <option value="LOW">Alacsony</option>
+            <option value="MEDIUM">Közepes</option>
+            <option value="HIGH">Magas</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="status" class="form-label">Státusz *</label>
+          <select id="status" class="form-select" formControlName="status">
+            <option value="TODO">Tennivaló</option>
+            <option value="IN_PROGRESS">Folyamatban</option>
+            <option value="DONE">Kész</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="dueDate" class="form-label">Határidő</label>
+        <input
+          type="date"
+          id="dueDate"
+          class="form-control"
+          formControlName="dueDate"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="assigneeUsername" class="form-label">Hozzárendelt</label>
+        <select id="assigneeUsername" class="form-select" formControlName="assigneeUsername">
+          <option value="">— Senki —</option>
+          <option *ngFor="let member of members" [value]="member.username">
+            {{ member.username }}
+          </option>
+        </select>
+      </div>
+
+      <div *ngIf="globalError" class="alert alert-danger">
+        {{ globalError }}
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Mentés...' : 'Mentés' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancelEditing()" [disabled]="submitting">
+          Mégse
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

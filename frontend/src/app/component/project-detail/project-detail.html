@@ -14,7 +14,6 @@
     {{ globalError }}
   </div>
 
-  <!-- Projekt adatlap (nézet mód) -->
   <div *ngIf="project && !editing">
     <div class="d-flex justify-content-between align-items-start mb-3">
       <h2 class="mb-0">{{ project.name }}</h2>
@@ -49,7 +48,6 @@
       {{ globalError }}
     </div>
 
-    <!-- Tagok szekció -->
     <hr class="mt-4" />
     <h4 class="mb-3">Tagok</h4>
 
@@ -83,7 +81,6 @@
       </li>
     </ul>
 
-    <!-- Tag hozzáadása form (csak OWNER-nek) -->
     <div *ngIf="isCurrentUserOwner()" class="card">
       <div class="card-body">
         <h6 class="card-title">Tag hozzáadása</h6>
@@ -110,7 +107,6 @@
     <app-task-board [projectId]="projectId!"></app-task-board>
   </div>
 
-  <!-- Szerkesztés mód -->
   <div *ngIf="project && editing">
     <h2 class="mb-4">Projekt szerkesztése</h2>
 

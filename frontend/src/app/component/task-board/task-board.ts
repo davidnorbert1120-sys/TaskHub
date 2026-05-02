@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TaskService } from '../../service/task.service';
 import { TaskListItemModel } from '../../model/task-list-item.model';
@@ -18,7 +19,18 @@ export class TaskBoard implements OnChanges {
   loading = false;
   globalError: string | null = null;
 
-  constructor(private taskService: TaskService) {}
+  constructor(
+    private taskService: TaskService,
+    private router: Router
+  ) {}
+
+  goToCreate(): void {
+    this.router.navigate(['/projects', this.projectId, 'tasks', 'new']);
+  }
+
+  goToDetail(task: TaskListItemModel): void {
+    this.router.navigate(['/projects', this.projectId, 'tasks', task.id]);
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && this.projectId) {
