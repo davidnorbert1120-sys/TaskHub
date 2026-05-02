@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TaskService } from '../../service/task.service';
 import { ProjectMemberService } from '../../service/project-member.service';
+import { ProjectService } from '../../service/project.service';
 import { TaskItemModel } from '../../model/task-item.model';
 import { ProjectMemberItemModel } from '../../model/project-member-item.model';
 
@@ -20,6 +21,7 @@ export class TaskDetail implements OnInit {
   projectId: number | null = null;
   taskId: number | null = null;
   members: ProjectMemberItemModel[] = [];
+  projectOwnerUsername: string = '';
 
   editForm: FormGroup;
   editing = false;
@@ -32,7 +34,8 @@ export class TaskDetail implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private taskService: TaskService,
-    private projectMemberService: ProjectMemberService
+    private projectMemberService: ProjectMemberService,
+    private projectService: ProjectService
   ) {
     this.editForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(200)]],
@@ -54,6 +57,22 @@ export class TaskDetail implements OnInit {
       this.taskId = Number(taskIdParam);
       this.loadTask();
       this.loadMembers();
+      this.loadProjectOwner();
+    }
+  }
+
+  loadProjectOwner(): void {
+    if (this.projectId === null) {
+      this.globalError = 'Hibás projekt azonosító.';
+    } else {
+      this.projectService.getById(this.projectId).subscribe({
+        next: (project) => {
+          this.projectOwnerUsername = project.ownerUsername;
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('TaskDetail: failed to load project for owner info', error);
+        }
+      });
     }
   }
 

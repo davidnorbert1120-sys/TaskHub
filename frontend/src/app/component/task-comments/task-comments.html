@@ -1,0 +1,63 @@
+<div class="mb-3">
+  <h4 class="mb-3">Hozzászólások</h4>
+
+  <div *ngIf="loading" class="text-center my-3">
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+      <span class="visually-hidden">Betöltés...</span>
+    </div>
+  </div>
+
+  <div *ngIf="globalError" class="alert alert-danger">
+    {{ globalError }}
+  </div>
+
+  <div *ngIf="!loading && comments.length === 0" class="text-muted small mb-3">
+    Még nincs hozzászólás. Légy te az első!
+  </div>
+
+  <div *ngIf="!loading && comments.length > 0" class="mb-3">
+    <div *ngFor="let comment of comments" class="comment-card mb-2">
+      <div class="d-flex justify-content-between align-items-start mb-1">
+        <div>
+          <strong>{{ comment.authorUsername }}</strong>
+          <span class="text-muted small ms-2">
+            {{ comment.createdAt | date:'yyyy.MM.dd HH:mm' }}
+          </span>
+        </div>
+        <button *ngIf="canDelete(comment)"
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="onDelete(comment)">
+          Törlés
+        </button>
+      </div>
+      <div class="comment-content">{{ comment.content }}</div>
+    </div>
+  </div>
+
+  <form [formGroup]="commentForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-2">
+      <textarea
+        class="form-control"
+        rows="3"
+        placeholder="Írj egy hozzászólást..."
+        formControlName="content"
+        [class.is-invalid]="fieldHasError('content', 'required') || fieldHasError('content', 'maxlength')"
+      ></textarea>
+      <div *ngIf="fieldHasError('content', 'required')" class="invalid-feedback">
+        A hozzászólás nem lehet üres.
+      </div>
+      <div *ngIf="fieldHasError('content', 'maxlength')" class="invalid-feedback">
+        A hozzászólás legfeljebb 2000 karakter lehet.
+      </div>
+    </div>
+
+    <div *ngIf="submitError" class="alert alert-danger py-2">
+      {{ submitError }}
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-sm" [disabled]="submitting">
+      {{ submitting ? 'Küldés...' : 'Hozzászólás' }}
+    </button>
+  </form>
+</div>

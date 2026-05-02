@@ -15,6 +15,7 @@ import { ProjectDetail } from './component/project-detail/project-detail';
 import { TaskBoard } from './component/task-board/task-board';
 import { TaskCreateForm } from './component/task-create-form/task-create-form';
 import { TaskDetail } from './component/task-detail/task-detail';
+import { TaskComments } from './component/task-comments/task-comments';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { TaskDetail } from './component/task-detail/task-detail';
     ProjectDetail,
     TaskBoard,
     TaskCreateForm,
-    TaskDetail
+    TaskDetail,
+    TaskComments
   ],
   imports: [
     BrowserModule,

@@ -53,6 +53,13 @@
       <dd class="col-sm-9">{{ task.updatedAt | date:'yyyy.MM.dd HH:mm' }}</dd>
     </dl>
 
+    <hr class="mt-4" />
+    <app-task-comments
+      [projectId]="projectId!"
+      [taskId]="taskId!"
+      [projectOwnerUsername]="projectOwnerUsername">
+    </app-task-comments>
+
     <div *ngIf="globalError" class="alert alert-danger mt-3">
       {{ globalError }}
     </div>
