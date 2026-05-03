@@ -40,7 +40,7 @@ export class LoginForm {
         next: (response) => {
           console.log('Login successful for user:', response.user.username);
           this.submitting = false;
-          this.router.navigate(['/']);
+          this.router.navigate(['/projects']);
         },
         error: (error: HttpErrorResponse) => {
           console.error('Login failed:', error);

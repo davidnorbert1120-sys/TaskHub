@@ -1,0 +1,18 @@
+<div class="container mt-5 text-center" style="max-width: 500px;">
+
+  <div *ngIf="!errorMessage">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Betöltés...</span>
+    </div>
+    <p>Bejelentkezés folyamatban...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+    <div class="mt-3">
+      <button type="button" class="btn btn-primary" (click)="goToLogin()">
+        Vissza a bejelentkezéshez
+      </button>
+    </div>
+  </div>
+</div>

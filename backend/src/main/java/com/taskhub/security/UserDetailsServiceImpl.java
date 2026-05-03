@@ -25,9 +25,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found" + username));
 
+        String passwordHash;
+        if (user.getPasswordHash() == null) {
+            passwordHash = "";
+        } else {
+            passwordHash = user.getPasswordHash();
+        }
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
-                user.getPasswordHash(),
+                passwordHash,
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
     }

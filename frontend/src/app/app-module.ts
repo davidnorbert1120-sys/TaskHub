@@ -17,6 +17,7 @@ import { TaskCreateForm } from './component/task-create-form/task-create-form';
 import { TaskDetail } from './component/task-detail/task-detail';
 import { TaskComments } from './component/task-comments/task-comments';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import { OAuth2Callback } from './component/oauth2-callback/oauth2-callback';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     TaskBoard,
     TaskCreateForm,
     TaskDetail,
-    TaskComments
+    TaskComments,
+    OAuth2Callback
   ],
   imports: [
     BrowserModule,

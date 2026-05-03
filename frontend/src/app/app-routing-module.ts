@@ -8,10 +8,12 @@ import { ProjectCreateForm } from './component/project-create-form/project-creat
 import { ProjectDetail } from './component/project-detail/project-detail';
 import {TaskCreateForm} from './component/task-create-form/task-create-form';
 import {TaskDetail} from './component/task-detail/task-detail';
+import { OAuth2Callback } from './component/oauth2-callback/oauth2-callback';
 
 const routes: Routes = [
   { path: 'register', component: RegisterForm },
   { path: 'login', component: LoginForm },
+  { path: 'oauth2/callback', component: OAuth2Callback },
   { path: 'projects/new', component: ProjectCreateForm, canActivate: [authGuard] },
   { path: 'projects/:id', component: ProjectDetail, canActivate: [authGuard] },
   { path: 'projects', component: ProjectList, canActivate: [authGuard] },
