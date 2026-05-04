@@ -9,6 +9,7 @@ import com.taskhub.domain.User;
 import com.taskhub.dto.incoming.TaskCreateCommand;
 import com.taskhub.dto.incoming.TaskUpdateCommand;
 import com.taskhub.dto.incoming.UpdateTaskStatusCommand;
+import com.taskhub.dto.outgoing.TaskEvent;
 import com.taskhub.dto.outgoing.TaskItem;
 import com.taskhub.dto.outgoing.TaskListItem;
 import com.taskhub.exception.InvalidAssigneeException;
@@ -23,6 +24,7 @@ import com.taskhub.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,19 +47,23 @@ public class TaskService {
 
     private final ModelMapper modelMapper;
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Autowired
     public TaskService(TaskRepository taskRepository,
                        ProjectRepository projectRepository,
                        ProjectMemberRepository projectMemberRepository,
                        UserRepository userRepository,
                        CommentRepository commentRepository,
-                       ModelMapper modelMapper) {
+                       ModelMapper modelMapper,
+                       SimpMessagingTemplate messagingTemplate) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public TaskItem create(Long projectId, TaskCreateCommand command, String callerUsername) {
@@ -120,7 +126,16 @@ public class TaskService {
 
         log.info("Task {} status changed to {} in project {} by user {}",
                 taskId, command.getStatus(), projectId, callerUsername);
-        return toTaskItem(task);
+
+        TaskItem item = toTaskItem(task);
+        broadcastTaskEvent(projectId, "STATUS_CHANGED", item);
+        return item;
+    }
+
+    private void broadcastTaskEvent(Long projectId, String type, TaskItem task) {
+        String destination = "/topic/projects/" + projectId + "/tasks";
+        messagingTemplate.convertAndSend(destination, new TaskEvent(type, task));
+        log.debug("Broadcast {} event for task {} to {}", type, task.getId(), destination);
     }
 
     public void delete(Long projectId, Long taskId, String callerUsername) {
