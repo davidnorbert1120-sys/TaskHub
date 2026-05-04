@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import flatpickr from 'flatpickr';
+import { Instance as FlatpickrInstance } from 'flatpickr/dist/types/instance';
 import { TaskService } from '../../service/task.service';
 import { ProjectMemberService } from '../../service/project-member.service';
 import { ProjectMemberItemModel } from '../../model/project-member-item.model';
@@ -13,13 +15,17 @@ import { TaskCreateCommandModel } from '../../model/task-create-command.model';
   templateUrl: './task-create-form.html',
   styleUrl: './task-create-form.css'
 })
-export class TaskCreateForm implements OnInit {
+export class TaskCreateForm implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('dueDateInput') dueDateInput!: ElementRef<HTMLInputElement>;
 
   projectId: number | null = null;
   taskForm: FormGroup;
   members: ProjectMemberItemModel[] = [];
   submitting = false;
   globalError: string | null = null;
+
+  private flatpickrInstance: FlatpickrInstance | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -45,6 +51,22 @@ export class TaskCreateForm implements OnInit {
     } else {
       this.projectId = Number(idParam);
       this.loadMembers();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.flatpickrInstance = flatpickr(this.dueDateInput.nativeElement, {
+      dateFormat: 'Y-m-d',
+      allowInput: true,
+      onChange: (selectedDates, dateString) => {
+        this.taskForm.get('dueDate')?.setValue(dateString);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.flatpickrInstance !== null) {
+      this.flatpickrInstance.destroy();
     }
   }
 

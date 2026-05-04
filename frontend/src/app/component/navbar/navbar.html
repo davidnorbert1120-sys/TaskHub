@@ -1,37 +1,29 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark" data-bs-theme="dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="">TaskHub</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+<nav class="th-navbar">
+  <div class="th-navbar-inner">
+    <a class="th-brand" routerLink="">
+      <span class="th-brand-logo">T</span>
+      <span class="th-brand-name">TaskHub</span>
+    </a>
 
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item" *ngIf="isLoggedIn()">
-          <a class="nav-link" aria-current="page" routerLink="projects">Projektek</a>
-        </li>
-      </ul>
+    <div class="th-nav-links">
+      <a *ngIf="isLoggedIn()" class="th-nav-link" routerLink="projects" routerLinkActive="active">
+        Projektek
+      </a>
+    </div>
 
-      <ul class="navbar-nav" *ngIf="!isLoggedIn()">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" routerLink="register">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" routerLink="login">Login</a>
-        </li>
-      </ul>
+    <div class="th-nav-actions">
+      <ng-container *ngIf="!isLoggedIn()">
+        <a class="th-nav-link" routerLink="register" routerLinkActive="active">Regisztráció</a>
+        <a class="btn btn-primary btn-sm" routerLink="login">Bejelentkezés</a>
+      </ng-container>
 
-      <ul class="navbar-nav" *ngIf="isLoggedIn()">
-        <li class="nav-item">
-          <span class="navbar-text text-light me-3">
-            Bejelentkezve: <strong>{{ getCurrentUser()?.username }}</strong>
-          </span>
-        </li>
-        <li class="nav-item">
-          <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
-        </li>
-      </ul>
-
+      <ng-container *ngIf="isLoggedIn()">
+        <span class="th-user">
+          <span class="th-user-avatar">{{ (getCurrentUser()?.username ?? '?').charAt(0).toUpperCase() }}</span>
+          <span class="th-user-name">{{ getCurrentUser()?.username }}</span>
+        </span>
+        <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Kilépés</button>
+      </ng-container>
     </div>
   </div>
 </nav>

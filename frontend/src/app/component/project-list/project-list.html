@@ -1,6 +1,9 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Projektjeim</h2>
+<div class="container mt-4 mt-md-5">
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Projektjeim</h2>
+      <p class="page-subtitle">Kezeld a projekteket, amikben részt veszel</p>
+    </div>
     <button type="button" class="btn btn-primary" (click)="goToCreate()">
       + Új projekt
     </button>
@@ -16,16 +19,18 @@
     {{ globalError }}
   </div>
 
-  <div *ngIf="!loading && !globalError && projects.length === 0" class="text-center text-muted my-5">
-    <p>Még nincs projekted. Kattints a "+ Új projekt" gombra a kezdéshez!</p>
+  <div *ngIf="!loading && !globalError && projects.length === 0" class="empty-state">
+    <div class="empty-state-icon">📋</div>
+    <h4>Még nincs projekted</h4>
+    <p>Kattints a "+ Új projekt" gombra a kezdéshez!</p>
   </div>
 
   <div *ngIf="!loading && projects.length > 0" class="row g-3">
-    <div *ngFor="let project of projects" class="col-md-6 col-lg-4">
-      <div class="card h-100 project-card" (click)="goToDetail(project.id)">
+    <div *ngFor="let project of projects; let i = index" class="col-md-6 col-lg-4">
+      <div class="card h-100 project-card" [attr.data-color-index]="i % 5" (click)="goToDetail(project.id)">
         <div class="card-body">
           <h5 class="card-title">{{ project.name }}</h5>
-          <p class="card-text text-muted">
+          <p class="card-text">
             {{ project.description || 'Nincs leírás' }}
           </p>
         </div>

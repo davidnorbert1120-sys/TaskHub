@@ -1,6 +1,6 @@
 <div class="container mt-4">
 
-  <button type="button" class="btn btn-link mb-3 p-0" (click)="goBack()">
+  <button type="button" class="back-link" (click)="goBack()">
     ← Vissza a projektekhez
   </button>
 
@@ -81,7 +81,7 @@
       </li>
     </ul>
 
-    <div *ngIf="isCurrentUserOwner()" class="card">
+    <div *ngIf="isCurrentUserOwner()" class="card add-member-card">
       <div class="card-body">
         <h6 class="card-title">Tag hozzáadása</h6>
         <form [formGroup]="addMemberForm" (ngSubmit)="onAddMember()" novalidate>

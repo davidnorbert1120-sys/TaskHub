@@ -1,0 +1,51 @@
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--th-text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  padding: 0;
+  background: none;
+  border: none;
+  transition: color 0.15s ease;
+}
+
+.back-link:hover {
+  color: var(--th-primary);
+}
+
+.list-group-item {
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius) !important;
+  margin-bottom: 0.4rem;
+  padding: 0.7rem 1rem;
+  transition: background 0.15s ease;
+}
+
+.list-group-item:hover {
+  background: var(--th-bg);
+}
+
+.add-member-card {
+  max-width: 480px;
+}
+
+dl.row {
+  margin-top: 1rem;
+}
+
+dl.row dt {
+  font-weight: 500;
+  color: var(--th-text-muted);
+}
+
+dl.row dd {
+  color: var(--th-text);
+}
+
+hr {
+  border-color: var(--th-border);
+  opacity: 0.6;
+}

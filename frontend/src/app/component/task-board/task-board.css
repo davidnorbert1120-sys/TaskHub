@@ -1,49 +1,81 @@
 .kanban-column {
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  padding: 12px;
-  min-height: 200px;
+  background: var(--th-bg);
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-lg);
+  padding: 14px;
+  min-height: 240px;
 }
 
 .kanban-title {
   font-weight: 600;
-  color: #495057;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.task-card {
-  border-left: 3px solid #0d6efd;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.task-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.task-card.task-done {
-  border-left-color: #198754;
-  opacity: 0.75;
-}
-
-.task-title {
+  color: var(--th-text);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--th-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
+
+.kanban-title::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.col-md-4:nth-child(1) .kanban-title::before { background: #94a3b8; }
+.col-md-4:nth-child(2) .kanban-title::before { background: var(--th-primary); }
+.col-md-4:nth-child(3) .kanban-title::before { background: var(--th-success); }
 
 .kanban-cards {
   min-height: 100px;
 }
 
+.task-card {
+  background: var(--th-surface);
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  margin-bottom: 0.6rem;
+}
+
+.task-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--th-shadow);
+  border-color: var(--th-primary);
+}
+
+.task-card.task-done {
+  opacity: 0.7;
+}
+
+.task-card.task-done .task-title {
+  text-decoration: line-through;
+  color: var(--th-text-muted);
+}
+
+.task-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--th-text);
+  line-height: 1.4;
+}
+
 .task-card.cdk-drag-preview {
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--th-shadow-lg);
   transform: rotate(2deg);
+  border-color: var(--th-primary);
 }
 
 .task-card.cdk-drag-placeholder {
   opacity: 0.3;
+  background: var(--th-primary-soft);
+  border-style: dashed;
 }
 
 .cdk-drop-list-dragging .task-card:not(.cdk-drag-placeholder) {

@@ -1,6 +1,6 @@
 <div class="container mt-4" style="max-width: 700px;">
 
-  <button type="button" class="btn btn-link mb-3 p-0" (click)="goBack()">
+  <button type="button" class="back-link" (click)="goBack()">
     ← Vissza a projekthez
   </button>
 
@@ -125,10 +125,12 @@
       <div class="mb-3">
         <label for="dueDate" class="form-label">Határidő</label>
         <input
-          type="date"
+          type="text"
           id="dueDate"
+          #dueDateInput
           class="form-control"
           formControlName="dueDate"
+          placeholder="Válassz dátumot..."
         />
       </div>
 

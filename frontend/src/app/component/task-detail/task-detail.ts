@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import flatpickr from 'flatpickr';
+import { Instance as FlatpickrInstance } from 'flatpickr/dist/types/instance';
 import { TaskService } from '../../service/task.service';
 import { ProjectMemberService } from '../../service/project-member.service';
 import { ProjectService } from '../../service/project.service';
@@ -15,7 +17,7 @@ import { ProjectMemberItemModel } from '../../model/project-member-item.model';
   templateUrl: './task-detail.html',
   styleUrl: './task-detail.css'
 })
-export class TaskDetail implements OnInit {
+export class TaskDetail implements OnInit, OnDestroy {
 
   task: TaskItemModel | null = null;
   projectId: number | null = null;
@@ -28,6 +30,25 @@ export class TaskDetail implements OnInit {
   loading = false;
   submitting = false;
   globalError: string | null = null;
+
+  private flatpickrInstance: FlatpickrInstance | null = null;
+
+  @ViewChild('dueDateInput')
+  set dueDateInput(element: ElementRef<HTMLInputElement> | undefined) {
+    if (element !== undefined && this.flatpickrInstance === null) {
+      this.flatpickrInstance = flatpickr(element.nativeElement, {
+        dateFormat: 'Y-m-d',
+        allowInput: true,
+        defaultDate: this.editForm.get('dueDate')?.value || undefined,
+        onChange: (selectedDates, dateString) => {
+          this.editForm.get('dueDate')?.setValue(dateString);
+        }
+      });
+    } else if (element === undefined && this.flatpickrInstance !== null) {
+      this.flatpickrInstance.destroy();
+      this.flatpickrInstance = null;
+    }
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -45,6 +66,13 @@ export class TaskDetail implements OnInit {
       dueDate: [''],
       assigneeUsername: ['']
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.flatpickrInstance !== null) {
+      this.flatpickrInstance.destroy();
+      this.flatpickrInstance = null;
+    }
   }
 
   ngOnInit(): void {
