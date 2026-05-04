@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { ProjectListItemModel } from '../model/project-list-item.model';
 import { ProjectItemModel } from '../model/project-item.model';
 import { ProjectCreateCommandModel } from '../model/project-create-command.model';
@@ -9,7 +10,7 @@ import { ProjectUpdateCommandModel } from '../model/project-update-command.model
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
 
-  BASE_URL = 'http://localhost:8080/projects';
+  BASE_URL = `${environment.apiUrl}/projects`;
 
   constructor(private httpClient: HttpClient) {}
 

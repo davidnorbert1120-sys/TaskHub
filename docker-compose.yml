@@ -1,18 +1,17 @@
 services:
   db:
-    image: mysql:8.0
+    image: postgres:16
     container_name: taskhub-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,7 +28,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       JWT_SECRET: ${JWT_SECRET}
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DATABASE_URL: jdbc:postgresql://db:5432/${DB_NAME}
     depends_on:
       db:
         condition: service_healthy

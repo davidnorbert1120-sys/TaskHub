@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { ProjectMemberItemModel } from '../model/project-member-item.model';
 import { AddMemberCommandModel } from '../model/add-member-command.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectMemberService {
 
-  BASE_URL = 'http://localhost:8080/projects';
+  BASE_URL = `${environment.apiUrl}/projects`;
 
   constructor(private httpClient: HttpClient) {}
 

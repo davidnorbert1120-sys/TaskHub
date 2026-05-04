@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { AuthService } from '../../service/auth.service';
 
 @Component({
@@ -15,6 +16,7 @@ export class LoginForm {
   loginForm: FormGroup;
   globalError: string | null = null;
   submitting = false;
+  googleLoginUrl = `${environment.apiUrl}/oauth2/authorization/google`;
 
   constructor(
     private formBuilder: FormBuilder,

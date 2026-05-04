@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { TaskListItemModel } from '../model/task-list-item.model';
 import { TaskItemModel } from '../model/task-item.model';
 import { TaskCreateCommandModel } from '../model/task-create-command.model';
@@ -10,7 +11,7 @@ import { UpdateTaskStatusCommandModel } from '../model/update-task-status-comman
 @Injectable({ providedIn: 'root' })
 export class TaskService {
 
-  BASE_URL = 'http://localhost:8080/projects';
+  BASE_URL = `${environment.apiUrl}/projects`;
 
   constructor(private httpClient: HttpClient) {}
 

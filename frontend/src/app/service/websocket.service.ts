@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
 import { Observable, Subject } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { TaskItemModel } from '../model/task-item.model';
 
 export interface TaskEventModel {
@@ -18,9 +19,9 @@ export class WebSocketService {
     if (this.connected) {
       console.log('WebSocketService: already connected');
     } else {
-      console.log('WebSocketService: connecting to ws://localhost:8080/ws');
+      console.log('WebSocketService: connecting to', environment.wsUrl);
       this.client = new Client({
-        brokerURL: 'ws://localhost:8080/ws',
+        brokerURL: environment.wsUrl,
         reconnectDelay: 5000,
         debug: () => {}
       });

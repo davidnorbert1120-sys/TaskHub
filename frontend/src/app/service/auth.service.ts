@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { UserItemModel } from '../model/user-item.model';
 import { LoginCommandModel } from '../model/login-command.model';
 import { RegisterCommandModel } from '../model/register-command.model';
@@ -9,7 +10,7 @@ import { AuthResponseModel } from '../model/auth-response.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  BASE_URL = 'http://localhost:8080/auth';
+  BASE_URL = `${environment.apiUrl}/auth`;
 
   private readonly TOKEN_KEY = 'taskhub_token';
   private readonly USER_KEY = 'taskhub_user';
