@@ -2,12 +2,20 @@
 
 > Full-stack task management application — Spring Boot backend + Angular frontend
 
-![Java](https://img.shields.io/badge/Java-17-orange?logo=java)
+![Java](https://img.shields.io/badge/Java-21-orange?logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?logo=springboot)
 ![Angular](https://img.shields.io/badge/Angular-17+-red?logo=angular)
-![MySQL](https://img.shields.io/badge/MySQL-8-blue?logo=mysql)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)
 ![Docker](https://img.shields.io/badge/Docker-compose-blue?logo=docker)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+
+---
+
+## Live Demo
+
+- **Frontend:** https://taskhub-davidnorbert.netlify.app
+- **Backend API:** https://taskhub-backend-z95q.onrender.com
+- **Swagger UI:** https://taskhub-backend-z95q.onrender.com/swagger-ui.html
 
 ---
 
@@ -15,20 +23,17 @@
 
 TaskHub is a Trello-inspired project and task management web application. Users can create projects, invite team members, assign tasks with priorities and deadlines, and track progress through a Kanban-style board.
 
-> **Status:** 🚧 In progress
-
 ---
 
 ## Features
 
-- **Authentication** — JWT-based registration & login
+- **Authentication** — JWT-based registration & login, Google OAuth2 login
 - **Projects** — Create, edit, delete; invite members by email
 - **Role-based access** — OWNER / MEMBER per project
 - **Tasks** — Status (TODO / IN_PROGRESS / DONE), priority, due date, assignee
+- **Kanban board** — Drag & drop task management
 - **Comments** — Per-task comment threads
-- **Dashboard** — All your tasks, upcoming deadlines
-- **Search & filter** — By status, priority, assignee
-- **Responsive UI** — Works on mobile too
+- **Real-time updates** — WebSocket-based live notifications
 
 ---
 
@@ -36,12 +41,13 @@ TaskHub is a Trello-inspired project and task management web application. Users 
 
 | Layer | Technology |
 |---|---|
-| Backend | Java 17, Spring Boot 3, Spring Security, Spring Data JPA |
-| Database | MySQL 8 (production), H2 (tests) |
-| Auth | JWT (jjwt) |
-| Frontend | Angular 17+, Angular Material, RxJS |
+| Backend | Java 21, Spring Boot 3, Spring Security, Spring Data JPA |
+| Database | PostgreSQL 16 |
+| Auth | JWT (jjwt), Google OAuth2 |
+| Frontend | Angular 17+, Angular CDK, RxJS |
+| Real-time | WebSocket (STOMP) |
 | Docs | SpringDoc OpenAPI (Swagger UI) |
-| Testing | JUnit 5, Mockito, Karma, Jasmine |
+| Deployment | Render (backend), Netlify (frontend) |
 | DevOps | Docker, Docker Compose |
 
 ---
@@ -62,21 +68,18 @@ taskhub/
 
 ### Prerequisites
 
-- Java 17+
+- Java 21+
 - Node.js 18+ & npm
 - Docker & Docker Compose
 
 ### Run with Docker (recommended)
 
 ```bash
-# Copy and fill in environment variables
 cp .env.example .env
-
-# Start everything
 docker-compose up --build
 ```
 
-- Frontend: http://localhost
+- Frontend: http://localhost:4200
 - Backend API: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui.html
 
@@ -97,38 +100,26 @@ ng serve
 
 ---
 
+## Environment Variables
+
+The backend requires the following environment variables:
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL JDBC connection URL |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+| `JWT_SECRET` | Secret key for signing JWT tokens |
+| `GOOGLE_CLIENT_ID` | Google OAuth2 client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated list of allowed frontend origins |
+| `FRONTEND_URL` | Frontend base URL for OAuth2 redirect |
+
+---
+
 ## API Documentation
 
 Swagger UI is available at `/swagger-ui.html` when the backend is running.
-
----
-
-## Running Tests
-
-**Backend:**
-```bash
-cd backend
-./mvnw test
-```
-
-**Frontend:**
-```bash
-cd frontend
-ng test
-```
-
----
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in your values:
-
-```env
-DB_USERNAME=taskhub
-DB_PASSWORD=your_password
-DB_NAME=taskhub_db
-JWT_SECRET=your_jwt_secret_key
-```
 
 ---
 
