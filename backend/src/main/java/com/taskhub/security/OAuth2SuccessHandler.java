@@ -18,15 +18,18 @@ import java.util.Optional;
 @Slf4j
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private static final String FRONTEND_REDIRECT_URL = "http://localhost:4200/oauth2/callback";
-
     private final UserRepository userRepository;
 
     private final JwtService jwtService;
 
-    public OAuth2SuccessHandler(UserRepository userRepository, JwtService jwtService) {
+    private final String frontendRedirectUrl;
+
+    public OAuth2SuccessHandler(UserRepository userRepository,
+                                JwtService jwtService,
+                                @org.springframework.beans.factory.annotation.Value("${app.frontend-url:http://localhost:4200}") String frontendUrl) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.frontendRedirectUrl = frontendUrl + "/oauth2/callback";
     }
 
     @Override
@@ -44,7 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = findOrCreateUser(email, name);
         String token = jwtService.generateToken(user.getUsername());
 
-        String redirectUrl = FRONTEND_REDIRECT_URL + "?token=" + token;
+        String redirectUrl = frontendRedirectUrl + "?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 

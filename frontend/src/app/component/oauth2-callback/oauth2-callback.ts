@@ -32,7 +32,9 @@ export class OAuth2Callback implements OnInit {
       console.log('OAuth2Callback: token received, saving and fetching user');
       localStorage.setItem(this.TOKEN_KEY, token);
 
-      this.httpClient.get<UserItemModel>(`${environment.apiUrl}/users/me`).subscribe({
+      this.httpClient.get<UserItemModel>(`${environment.apiUrl}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({
         next: (user) => {
           console.log('OAuth2Callback: user fetched:', user.username);
           localStorage.setItem(this.USER_KEY, JSON.stringify(user));
